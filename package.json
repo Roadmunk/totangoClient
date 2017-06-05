@@ -5,7 +5,7 @@
   "homepage": "https://github.com/Roadmunk/totangoClient",
   "private": true,
   "licence": "MIT",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "scripts": {
     "test": "mocha"
   },
