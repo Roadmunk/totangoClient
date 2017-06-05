@@ -112,8 +112,8 @@ JS.class(TotangoClient, {
 
 			return {
 				trackActivity        : this.trackActivity(),
-				setUserAttributes    : this.setUserAttributes,
-				setAccountAttributes : this.setAccountAttributes,
+				setUserAttributes    : this.setUserAttributes(),
+				setAccountAttributes : this.setAccountAttributes(),
 			};
 		},
 	},
