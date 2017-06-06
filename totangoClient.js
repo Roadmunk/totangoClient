@@ -12,33 +12,33 @@ JS.class(TotangoClient, {
 		serviceID : '',
 	},
 
-	constructor : function(serviceId) {
-		this.serviceID    = serviceId;
+	constructor : function(serviceID) {
+		this.serviceID    = serviceID;
 	},
 
 	methods : {
 		/**
 		 * Track user activities to Totango.
-		 * @param {String} [accountId]
-		 * @param {String} [userId]
+		 * @param {String} [accountID]
+		 * @param {String} [userID]
 		 * @param {String} [activity]
 		 * @param {String} [module]
 		 */
-		trackActivity : function(accountId, userId, activity, module, callback) {
+		trackActivity : function(accountID, userID, activity, module, callback) {
 			callback = callback || function() {};
 
-			if (typeof accountId !== 'string' ||
-	            typeof userId !== 'string' ||
-	            typeof activity !== 'string' ||
-	            typeof module !== 'string' ||
-	            typeof callback !== 'function') {
+			if (typeof accountID !== 'string' ||
+				typeof userID !== 'string' ||
+				typeof activity !== 'string' ||
+				typeof module !== 'string' ||
+				typeof callback !== 'function') {
 				callback(new Error('totangoClient.trackActivity: Invalid parameters'));
 			}
 			else {
 				const params = {
 					sdr_s : this.serviceID,
-					sdr_o : accountId,
-					sdr_u : userId,
+					sdr_o : accountID,
+					sdr_u : userID,
 					sdr_a : activity,
 					sdr_m : module,
 				};
@@ -49,12 +49,12 @@ JS.class(TotangoClient, {
 
 		/**
 		 * Send user attributes to Totango.
-		 * @param {String} [accountId]
-		 * @param {String} [userId]
+		 * @param {String} [accountID]
+		 * @param {String} [userID]
 		 * @param {Object} [attributes]
 		 */
-		setUserAttributes : function(accountId, userId, attributes, callback) {
-			if (typeof accountId !== 'string' || typeof userId !== 'string') {
+		setUserAttributes : function(accountID, userID, attributes, callback) {
+			if (typeof accountID !== 'string' || typeof userID !== 'string') {
 				callback(new Error('totangoClient.setUserAttributes: Invalid parameters'));
 			}
 			else {
@@ -63,27 +63,27 @@ JS.class(TotangoClient, {
 					initialParams['sdr_u.name'] = attributes.name;
 					delete attributes.name;
 				}
-				this.setAttributes('sdr_u.', initialParams, { accountId : accountId, userId : userId }, attributes, callback);
+				this.setAttributes('sdr_u.', initialParams, { accountID : accountID, userID : userID }, attributes, callback);
 			}
 		},
 
 		/**
 		 * Send account attributes to Totango.
-		 * @param {String} [accountId]
+		 * @param {String} [accountID]
 		 * @param {Object} [attributes]
 		 */
-		setAccountAttributes : function(accountId, attributes, callback) {
-	        if (typeof accountId !== 'string') {
-		callback(new Error('totangoClient.setAccountAttributes: Invalid parameters'));
-	        }
-	        else {
-	            const initialParams = {};
-	            if (attributes.name) {
-	                initialParams['sdr_odn'] = attributes.name;
-	                delete attributes.name;
-	            }
-	            this.setAttributes('sdr_o.', initialParams, { accountId : accountId }, attributes, callback);
-	        }
+		setAccountAttributes : function(accountID, attributes, callback) {
+			if (typeof accountID !== 'string') {
+				callback(new Error('totangoClient.setAccountAttributes: Invalid parameters'));
+			}
+			else {
+				const initialParams = {};
+				if (attributes.name) {
+					initialParams['sdr_odn'] = attributes.name;
+					delete attributes.name;
+				}
+				this.setAttributes('sdr_o.', initialParams, { accountID : accountID }, attributes, callback);
+			}
 	 	},
 
 		setAttributes : function(prefix, initialParams, identity, attributes, callback) {
@@ -96,14 +96,13 @@ JS.class(TotangoClient, {
 
 				let params = {
 					sdr_s : this.serviceID,
-					sdr_o : identity.accountId,
+					sdr_o : identity.accountID,
 				};
-				if (identity.userId)  params['sdr_u'] = identity.userId;
+				if (identity.userID)  params['sdr_u'] = identity.userID;
 				params = extend(params, initialParams);
 
 				for (const attr in attributes)
 					params[prefix + attr] = attributes[attr];
-
 
 				this.sendSDR(params, callback);
 			}
@@ -130,7 +129,7 @@ JS.class(TotangoClient, {
 					callback(new Error(`Invalid request, status code: ${res.statusCode}`));
 
 				else
-	                callback(null);
+					callback(null);
 			});
 		},
 	},
