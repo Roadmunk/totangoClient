@@ -28,10 +28,10 @@ JS.class(TotangoClient, {
 			callback = callback || function() {};
 
 			if (typeof accountID !== 'string' ||
-	            typeof userID !== 'string' ||
-	            typeof activity !== 'string' ||
-	            typeof module !== 'string' ||
-	            typeof callback !== 'function') {
+				typeof userID !== 'string' ||
+				typeof activity !== 'string' ||
+				typeof module !== 'string' ||
+				typeof callback !== 'function') {
 				callback(new Error('totangoClient.trackActivity: Invalid parameters'));
 			}
 			else {
@@ -73,17 +73,17 @@ JS.class(TotangoClient, {
 		 * @param {Object} [attributes]
 		 */
 		setAccountAttributes : function(accountID, attributes, callback) {
-	        if (typeof accountID !== 'string') {
+			if (typeof accountID !== 'string') {
 				callback(new Error('totangoClient.setAccountAttributes: Invalid parameters'));
-	        }
-	        else {
-	            const initialParams = {};
-	            if (attributes.name) {
-	                initialParams['sdr_odn'] = attributes.name;
-	                delete attributes.name;
-	            }
-	            this.setAttributes('sdr_o.', initialParams, { accountID : accountID }, attributes, callback);
-	        }
+			}
+			else {
+				const initialParams = {};
+				if (attributes.name) {
+					initialParams['sdr_odn'] = attributes.name;
+					delete attributes.name;
+				}
+				this.setAttributes('sdr_o.', initialParams, { accountID : accountID }, attributes, callback);
+			}
 	 	},
 
 		setAttributes : function(prefix, initialParams, identity, attributes, callback) {
@@ -129,7 +129,7 @@ JS.class(TotangoClient, {
 					callback(new Error(`Invalid request, status code: ${res.statusCode}`));
 
 				else
-	                callback(null);
+					callback(null);
 			});
 		},
 	},
