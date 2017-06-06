@@ -1,8 +1,7 @@
 const JS            = require('JSClass/JS');
-const url           = require('url');
-const request       = require('request');
-const querystring   = require('querystring');
 const extend        = require('util')._extend;
+const Promise       = require('bluebird');
+const axios         = require('axios');
 
 const TotangoClient = module.exports = JS.class('TotangoClient');
 
@@ -13,7 +12,7 @@ JS.class(TotangoClient, {
 	},
 
 	constructor : function(serviceID) {
-		this.serviceID    = serviceID;
+		this.serviceID = serviceID;
 	},
 
 	methods : {
@@ -24,28 +23,29 @@ JS.class(TotangoClient, {
 		 * @param {String} [activity]
 		 * @param {String} [module]
 		 */
-		trackActivity : function(accountID, userID, activity, module, callback) {
-			callback = callback || function() {};
-
-			if (typeof accountID !== 'string' ||
-				typeof userID !== 'string' ||
-				typeof activity !== 'string' ||
-				typeof module !== 'string' ||
-				typeof callback !== 'function') {
-				callback(new Error('totangoClient.trackActivity: Invalid parameters'));
+		trackActivity : Promise.coroutine(function*(accountID, userID, activity, module) {
+			try {
+				if (typeof accountID !== 'string' ||
+					typeof userID !== 'string' ||
+					typeof activity !== 'string' ||
+					typeof module !== 'string') {
+					throw new Error('totangoClient.trackActivity: Invalid parameters');
+				}
+				else {
+					const params = {
+						sdr_s : this.serviceID,
+						sdr_o : accountID,
+						sdr_u : userID,
+						sdr_a : activity,
+						sdr_m : module,
+					};
+					yield this.sendSDR(params);
+				}
 			}
-			else {
-				const params = {
-					sdr_s : this.serviceID,
-					sdr_o : accountID,
-					sdr_u : userID,
-					sdr_a : activity,
-					sdr_m : module,
-				};
-
-				this.sendSDR(params, callback);
+			catch (error) {
+				throw error;
 			}
-		},
+		}),
 
 		/**
 		 * Send user attributes to Totango.
@@ -53,84 +53,90 @@ JS.class(TotangoClient, {
 		 * @param {String} [userID]
 		 * @param {Object} [attributes]
 		 */
-		setUserAttributes : function(accountID, userID, attributes, callback) {
-			if (typeof accountID !== 'string' || typeof userID !== 'string') {
-				callback(new Error('totangoClient.setUserAttributes: Invalid parameters'));
-			}
-			else {
-				const initialParams = {};
-				if (attributes.name) {
-					initialParams['sdr_u.name'] = attributes.name;
-					delete attributes.name;
+		setUserAttributes : Promise.coroutine(function*(accountID, userID, attributes) {
+			try {
+				if (typeof accountID !== 'string' || typeof userID !== 'string') {
+					throw new Error('totangoClient.setUserAttributes: Invalid parameters');
 				}
-				this.setAttributes('sdr_u.', initialParams, { accountID : accountID, userID : userID }, attributes, callback);
+				else {
+					const initialParams = {};
+					if (attributes.name) {
+						initialParams['sdr_u.name'] = attributes.name;
+						delete attributes.name;
+					}
+					yield this.setAttributes('sdr_u.', initialParams, { accountID : accountID, userID : userID }, attributes);
+				}
 			}
-		},
+			catch (error) {
+				throw error;
+			}
+		}),
 
 		/**
 		 * Send account attributes to Totango.
 		 * @param {String} [accountID]
 		 * @param {Object} [attributes]
 		 */
-		setAccountAttributes : function(accountID, attributes, callback) {
-			if (typeof accountID !== 'string') {
-				callback(new Error('totangoClient.setAccountAttributes: Invalid parameters'));
-			}
-			else {
-				const initialParams = {};
-				if (attributes.name) {
-					initialParams['sdr_odn'] = attributes.name;
-					delete attributes.name;
+		setAccountAttributes : Promise.coroutine(function*(accountID, attributes) {
+			try {
+				if (typeof accountID !== 'string') {
+					throw new Error('totangoClient.setAccountAttributes: Invalid parameters');
 				}
-				this.setAttributes('sdr_o.', initialParams, { accountID : accountID }, attributes, callback);
+				else {
+					const initialParams = {};
+					if (attributes.name) {
+						initialParams['sdr_odn'] = attributes.name;
+						delete attributes.name;
+					}
+					yield this.setAttributes('sdr_o.', initialParams, { accountID : accountID }, attributes);
+				}
 			}
-	 	},
-
-		setAttributes : function(prefix, initialParams, identity, attributes, callback) {
-			callback = callback || function() {};
-
-			if (typeof attributes !== 'object' || typeof callback !== 'function') {
-				callback(new Error('totangoClient: Invalid attributes'));
+			catch (error) {
+				throw error;
 			}
-			else {
+		}),
 
-				let params = {
-					sdr_s : this.serviceID,
-					sdr_o : identity.accountID,
-				};
-				if (identity.userID)  params['sdr_u'] = identity.userID;
-				params = extend(params, initialParams);
+		setAttributes : Promise.coroutine(function*(prefix, initialParams, identity, attributes) {
+			try {
+				if (typeof attributes !== 'object') {
+					throw new Error('totangoClient: Invalid attributes');
+				}
+				else {
 
-				for (const attr in attributes)
-					params[prefix + attr] = attributes[attr];
+					let params = {
+						sdr_s : this.serviceID,
+						sdr_o : identity.accountID,
+					};
+					if (identity.userID)  params['sdr_u'] = identity.userID;
+					params = extend(params, initialParams);
 
-				this.sendSDR(params, callback);
+					for (const attr in attributes)
+						params[prefix + attr] = attributes[attr];
+
+					yield this.sendSDR(params);
+				}
 			}
-		},
+			catch (error) {
+				throw error;
+			}
+		}),
 
-		sendSDR : function(params, callback) {
+		sendSDR : Promise.coroutine(function*(params) {
+			let response;
 
-			const options = {
-				url : url.format({
-					protocol : 'https',
-					host     : 'sdr.totango.com',
-					pathname : 'pixel.gif/',
-					search   : querystring.stringify(params),
-				}),
-				method : 'GET',
-				jar    : false,
-			};
+			try {
+				response = yield axios({
+					method : 'GET',
+					url    : 'https://sdr.totango.com/pixel.gif',
+					params : params,
+				});
 
-			request(options, function(err, res, body) {
-				if (err)
-					callback(err);
-
-				else if (res.statusCode !== 200 && res.statusCode !== 201)
-					callback(new Error(`Invalid request, status code: ${res.statusCode}`));
-
-				else
-					callback(null);
-			});
-		},
+				if (response.status !== 200 && response.status !== 201)
+					throw new Error(`Invalid request, status code: ${response.status}`);
+			}
+			catch (error) {
+				throw error;
+			}
+		}),
 	},
 });
