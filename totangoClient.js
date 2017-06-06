@@ -1,30 +1,29 @@
-const JS          = require('JSClass/JS');
-const url = require('url');
-const request = require('request');
-const querystring = require('querystring');
-const extend = require('util')._extend;
+const JS            = require('JSClass/JS');
+const url           = require('url');
+const request       = require('request');
+const querystring   = require('querystring');
+const extend        = require('util')._extend;
 
-const TotangoClient   = module.exports = JS.class('TotangoClient');
+const TotangoClient = module.exports = JS.class('TotangoClient');
 
 
 JS.class(TotangoClient, {
 	fields : {
-		service_id : '',
+		serviceID : '',
 	},
 
 	constructor : function(serviceId) {
-		this.service_id    = serviceId;
+		this.serviceID    = serviceId;
 	},
 
 	methods : {
 		/**
-		 * Login to Pardot.
-		 * This is called automatically by any other API call if there is no valid this.apiKey.
-		 * @param {String} [email]
-		 * @param {String} [password]
-		 * @param {String} [userKey]
+		 * Track user activities to Totango.
+		 * @param {String} [accountId]
+		 * @param {String} [userId]
+		 * @param {String} [activity]
+		 * @param {String} [module]
 		 */
-
 		trackActivity : function(accountId, userId, activity, module, callback) {
 			callback = callback || function() {};
 
@@ -33,11 +32,11 @@ JS.class(TotangoClient, {
 	            typeof activity !== 'string' ||
 	            typeof module !== 'string' ||
 	            typeof callback !== 'function') {
-				callback(new Error('totango-tracker.trackActivity: Invalid parameters'));
+				callback(new Error('totangoClient.trackActivity: Invalid parameters'));
 			}
 			else {
 				const params = {
-					sdr_s : this.service_id,
+					sdr_s : this.serviceID,
 					sdr_o : accountId,
 					sdr_u : userId,
 					sdr_a : activity,
@@ -48,9 +47,15 @@ JS.class(TotangoClient, {
 			}
 		},
 
+		/**
+		 * Send user attributes to Totango.
+		 * @param {String} [accountId]
+		 * @param {String} [userId]
+		 * @param {Object} [attributes]
+		 */
 		setUserAttributes : function(accountId, userId, attributes, callback) {
 			if (typeof accountId !== 'string' || typeof userId !== 'string') {
-				callback(new Error('totango-tracker.setUserAttributes: Invalid parameters'));
+				callback(new Error('totangoClient.setUserAttributes: Invalid parameters'));
 			}
 			else {
 				const initialParams = {};
@@ -62,16 +67,35 @@ JS.class(TotangoClient, {
 			}
 		},
 
+		/**
+		 * Send account attributes to Totango.
+		 * @param {String} [accountId]
+		 * @param {Object} [attributes]
+		 */
+		setAccountAttributes : function(accountId, attributes, callback) {
+	        if (typeof accountId !== 'string') {
+		callback(new Error('totangoClient.setAccountAttributes: Invalid parameters'));
+	        }
+	        else {
+	            const initialParams = {};
+	            if (attributes.name) {
+	                initialParams['sdr_odn'] = attributes.name;
+	                delete attributes.name;
+	            }
+	            this.setAttributes('sdr_o.', initialParams, { accountId : accountId }, attributes, callback);
+	        }
+	 	},
+
 		setAttributes : function(prefix, initialParams, identity, attributes, callback) {
 			callback = callback || function() {};
 
 			if (typeof attributes !== 'object' || typeof callback !== 'function') {
-				callback(new Error('totango-tracker: Invalid attributes'));
+				callback(new Error('totangoClient: Invalid attributes'));
 			}
 			else {
 
 				let params = {
-					sdr_s : this.service_id,
+					sdr_s : this.serviceID,
 					sdr_o : identity.accountId,
 				};
 				if (identity.userId)  params['sdr_u'] = identity.userId;
@@ -84,7 +108,6 @@ JS.class(TotangoClient, {
 				this.sendSDR(params, callback);
 			}
 		},
-
 
 		sendSDR : function(params, callback) {
 
@@ -109,12 +132,6 @@ JS.class(TotangoClient, {
 				else
 	                callback(null);
 			});
-
-			return {
-				trackActivity        : this.trackActivity(),
-				setUserAttributes    : this.setUserAttributes(),
-				setAccountAttributes : this.setAccountAttributes(),
-			};
 		},
 	},
 });
