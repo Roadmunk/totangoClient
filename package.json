@@ -1,25 +1,22 @@
 {
   "name": "totangoClient",
   "description": "Client library for the Totango.com API",
-  "homepage": "https://github.com/Roadmunk/totangoClient",
+  "version": "1.0.2",
+  "repository": "Roadmunk/totangoClient",
   "private": true,
-  "licence": "MIT",
-  "version": "1.0.0",
-  "scripts": {
-    "test": "mocha"
-  },
-  "files": [
-    "index.js",
-    "totangoClient.js"
-  ],
+  "licence": "UNLICENSED",
+  "main": "totangoClient.js",
   "dependencies": {
-    "JSClass": "roadmunk/JS#1.x",
-    "util": "0.10.x",
-    "bluebird" : "3.4.x",
-    "axios"    : "0.15.x"
+    "JSClass": "github:roadmunk/JS#semver:^1.0.0",
+    "axios": "^0.16.0",
+    "bluebird": "^3.0.0",
+    "util": "^0.10.3"
   },
   "devDependencies": {
-    "eslint-config-roadmunk": "roadmunk/eslint-config-roadmunk"
+    "eslint": "^3.19.0",
+    "eslint-config-roadmunk": "github:roadmunk/eslint-config-roadmunk#semver:^1.0.2"
   },
-  "false": {}
+  "engines": {
+    "node": ">=6.10.2"
+  }
 }
