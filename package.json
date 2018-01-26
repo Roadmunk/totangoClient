@@ -1,14 +1,14 @@
 {
   "name": "@roadmunk/totangoclient",
   "description": "Client library for the Totango.com API",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Roadmunk/totangoClient.git"
   },
   "main": "totangoClient.js",
   "dependencies": {
-    "JSClass": "github:roadmunk/JS#semver:^1.0.8",
+    "@roadmunk/jsclass": "^1.0.8",
     "axios": "^0.16.0",
     "bluebird": "^3.0.0",
     "util": "^0.10.3"

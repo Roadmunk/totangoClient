@@ -1,4 +1,4 @@
-const JS            = require('JSClass/JS');
+const JS            = require('@roadmunk/jsclass/JS');
 const extend        = require('util')._extend;
 const Promise       = require('bluebird');
 const axios         = require('axios');
