@@ -6,8 +6,6 @@
     "type": "git",
     "url": "git+https://github.com/Roadmunk/totangoClient.git"
   },
-  "private": true,
-  "licence": "UNLICENSED",
   "main": "totangoClient.js",
   "dependencies": {
     "JSClass": "github:roadmunk/JS#semver:^1.0.8",
