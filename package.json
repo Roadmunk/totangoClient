@@ -1,8 +1,11 @@
 {
-  "name": "totangoClient",
+  "name": "@roadmunk/totangoclient",
   "description": "Client library for the Totango.com API",
   "version": "1.0.3",
-  "repository": "Roadmunk/totangoClient",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Roadmunk/totangoClient.git"
+  },
   "private": true,
   "licence": "UNLICENSED",
   "main": "totangoClient.js",
@@ -18,5 +21,14 @@
   },
   "engines": {
     "node": ">=6.10.2"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/Roadmunk/totangoClient/issues"
+  },
+  "homepage": "https://github.com/Roadmunk/totangoClient#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Roadmunk",
+  "license": "ISC"
 }
